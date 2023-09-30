@@ -1,0 +1,47 @@
+{
+  "dns": {
+    "resource_group_name": "habitus-dns"
+  },
+  "networks": {
+    "habitus-platform-eu": {
+      "northeurope": [
+        "10.24.10.0/24",
+        "10.24.11.0/24",
+        "10.24.12.0/24"
+      ],
+      "westeurope": [
+        "10.24.20.0/24"
+      ]
+    },
+    "habitus-platform-int": {
+      "northeurope": [
+        "10.16.10.0/24",
+        "10.16.11.0/24",
+        "10.16.12.0/24"
+      ]
+    },
+    "habitus-platform-dev": {
+      "northeurope": [
+        "10.15.10.0/24",
+        "10.15.11.0/24",
+        "10.15.12.0/24"
+      ]
+    },
+    "habitus-vpn-eu": {
+      "northeurope": [
+        "10.0.0.0/24"
+      ]
+    },
+    "habitus-dmz-eu": {
+      "northeurope": [
+        "10.8.10.0/24"
+      ]
+    },
+    "habitus-hub-eu": {
+      "northeurope": [
+        "10.8.1.0/24"
+      ]
+    }
+  }
+  
+}

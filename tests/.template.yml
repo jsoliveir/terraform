@@ -1,0 +1,157 @@
+version: v3.0
+
+azure:
+  subscription: xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx
+  resourceGroup: azure-resource-group
+  location: northeurope
+  tags:
+    app: habitus-platform
+    env: production
+    reg: europe
+    ver: v3.4
+
+  aadRoleAssingments:
+  - group: Role-Developer
+    roles: 
+    - Azure Service Bus Data Owner
+    - Storage Blob Data Owner
+    - Key Vault Secrets User
+    - Services Hub Operator
+    - Reader
+
+  logAnalyticsWorkspace:
+    location: northeurope
+    
+  # Key Vaults
+  keyvault:
+    softDeleteRetentionInDays: 90
+    copyFrom:
+      - subscription: source-subscription-id
+        resourceGroup: source-resource-group
+        keyvault: source-keyvault
+        secret: source-secret-name
+        name: target-secret-name
+
+  # Virtual Networks
+  networks:
+    vnet-01:
+      location: northeurope
+      securityRules: {}
+      subnets:
+        platform: 10.24.10.0/24
+        aks01: 10.24.11.0/24
+        aks02: 10.24.12.0/24
+      serviceEndpoints:
+      - Microsoft.ServiceBus
+      - Microsoft.KeyVault
+      - Microsoft.Storage
+      - Microsoft.Sql
+
+  # SignalR Gateways
+  signalr:
+    sigr-01:
+      entrypoint: https://my.entrypoint.com
+      sku: Standard_S1
+      subnet: platform
+      network: vnet-01
+      capacity: 1
+
+  # Kubernetes Clusters
+  kubernetes:
+    aks-01:
+      version: 1.26.3
+      network: vnet-01
+      subnet: aks01
+      nodePools:
+        system:
+          vmSize: Standard_DS2_v2
+          mode: System
+          diskSize: 60
+          taints: []
+          nodes: 1
+        platform:
+          vmSize: Standard_D4s_v3
+          mode: User
+          diskSize: 60
+          nodes: 1
+          taints:
+            - "dedicated=platform:NoSchedule"
+      storageDrivers:
+        snapshot: false
+        blob: false
+        file: true
+        disk: true
+
+  # Storage Accounts
+  storageAccounts:
+    data:
+      kind: StorageV2
+      sku: Standard_GRS
+      subnet: platform
+      network: vnet-01
+      nfsv3: false
+      asdl: false
+      containers: []
+      shares:
+        - name: platform
+          size: 10
+
+  # Service Bus Instances
+  servicebus:
+    asb-01:
+      sku: Standard
+      subnet: platform
+      network: vnet-01
+      capacity: 1
+      queues:
+        - notifications
+
+  # Redis Servers
+  redis:
+    redis-01:
+      version: '6.0'
+      sku: Standard
+      subnet: platform
+      network: vnet-01
+      family: C
+      capacity: 1
+
+  # Microsoft SQL Servers
+  mssql:
+    adminGroup: 
+      id: xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx
+      name: Role-DBA
+    # https://learn.microsoft.com/en-us/sql/t-sql/statements/grant-database-permissions-transact-sql?view=sql-server-ver16#remarks
+    aadAccessControl:
+      Role-Developer:
+        - ALTER ANY SCHEMA
+        - CONTROL
+        - ALTER
+    serviceAccountPermissions:
+      # do not touch them
+      - ALTER ANY SCHEMA
+      - CONTROL
+      - ALTER
+    servers:
+      sql-01:
+        subnet: platform
+        network: vnet-01
+    databasePools: {}
+      # default:
+      #   server: sql-01
+      #   maxCapacityPerDatabase: 200
+      #   minCapacityPerDatabase: 10
+      #   maxDatabaseSize: 200
+      #   sku: StandardPool
+      #   tier: Standard
+      #   capacity: 200
+    databases:      
+      HabitusHealth.Platform.VEA:
+        server: sql-01
+        # sku: ElasticPool
+        sku: Basic
+        tier: Basic
+        pool: default
+        capacity: 5
+        size: 2
+      
