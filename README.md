@@ -2,8 +2,8 @@
 
 ## Terraform
 
-* [Terraform Azure Modules](terraform/azure)
-* [Terraform SSL Modules](terraform/ssl)
+* [Terraform Azure Modules](modules/azure)
+* [Terraform SSL Modules](modules/ssl)
 
 ### Example
 
