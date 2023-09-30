@@ -1,4 +1,4 @@
 
 locals {
-  config = yamldecode(file("${path.module}/.template.yml"))
+  config = yamldecode(file("${path.module}/@template.yml"))
 }
